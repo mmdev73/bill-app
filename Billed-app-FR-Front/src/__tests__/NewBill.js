@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { screen, fireEvent } from "@testing-library/dom"
+import { screen, fireEvent, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
@@ -35,7 +35,6 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', handleChangeFile)
       const fileWithBadMimeType = new File(['bill-test.pdf'], 'bill-test.pdf', { type: "application/pdf" })
       fireEvent.change(fileInput, { target: { files: [fileWithBadMimeType]}})
-      const file = fileInput.files[0]
       jest.spyOn(window, 'alert').mockImplementation(() => {
         expect(jsdomAlert).toHaveBeenCalledWith('Mauvais type de fichier')
         expect(fileInput).toBeEmpty()
@@ -48,8 +47,21 @@ describe("Given I am connected as an employee", () => {
       })
       const fileInput = screen.getByTestId('file')
       const handleChangeFile = jest.fn(newBill.handleChangeFile)
-      fileInput.addEventListener('change', handleChangeFile)
       const fileWithCorrectExtension = new File(['bill-test.png'], 'bill-test.png', {type: 'image/png'})
+      fileInput.addEventListener('change',(e) => {
+        handleChangeFile(e).then((billObj) => {
+          //console.log(billObj)
+          waitFor(() => {
+            expect(billObj.billID).toBe('1234')
+          })
+          waitFor(() => {
+            expect(billObj.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+          })
+          waitFor(() => {
+            expect(billObj.fileName).toBe('bill-test.png')
+          })
+        })
+      })
       //userEvent.upload(file, 'bill-test.png')
       fireEvent.change(fileInput, {target: {files: [fileWithCorrectExtension]}})
       expect(handleChangeFile).toHaveBeenCalledTimes(1)

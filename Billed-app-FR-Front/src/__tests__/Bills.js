@@ -32,7 +32,6 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
       expect(windowIcon).toHaveClass('active-icon')
-
     })
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
@@ -41,7 +40,7 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
-    test("Then i click on NewBill button I should be redirected on NewBill page", async () => {
+    test("Then i click on NewBill button I should be redirected on NewBill page", () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -62,6 +61,7 @@ describe("Given I am connected as an employee", () => {
       newBillButton.addEventListener('click', handleClickNewBill)
       userEvent.click(newBillButton)
       expect(handleClickNewBill).toHaveBeenCalledTimes(1)
+      expect(screen.getByText('Envoyer une note de frais')).toBeInTheDocument()
     })
     test("Then I click on the icon eye, a modal should open", () => {
       const bill = new Bills({
@@ -74,13 +74,17 @@ describe("Given I am connected as an employee", () => {
       const globalEyeIcon = screen.getAllByTestId('icon-eye')
       const eyeIcon = screen.getAllByTestId('icon-eye')[0]
       const handleClickIconEye = jest.fn(bill.handleClickIconEye)
-      const modalMock = document.getElementById('modaleFile')
-      $.fn.modal = jest.fn(() => modalMock.classList.add('show')) // mock de la modal et apparition
-      globalEyeIcon.forEach(currentEyeIcon => {
-        currentEyeIcon.addEventListener('click', () => handleClickIconEye(currentEyeIcon))
+      const modalMock = screen.getByTestId('modaleFile')
+      $.fn.modal = jest.fn().mockImplementationOnce(() => modalMock.classList.add('show'))
+      if(globalEyeIcon) globalEyeIcon.forEach(currentEyeIcon => {
+        currentEyeIcon.addEventListener('click', () => {
+          handleClickIconEye(currentEyeIcon)
+          expect(handleClickIconEye).toHaveBeenCalledTimes(1)
+        })
       })
       userEvent.click(eyeIcon)
-      expect(handleClickIconEye).toHaveBeenCalledTimes(1)
+      expect(modalMock).toHaveClass('modal fade show')
+      
     })
     test("Then bills should be fetch correctly from store", async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -90,14 +94,15 @@ describe("Given I am connected as an employee", () => {
       const onNavigate = pathname => {
         document.body.innerHTML = ROUTES({pathname})
       }
-      const bill = new Bills({
+      const newBills = new Bills({
         document,
         onNavigate,
         store: mockedStore,
         localStorage: window.localStorage
       })
-      document.body.innerHTML = BillsUI({data: bills})
-      expect(bills).toHaveLength(4)
+      const billsList = newBills.store.bills().list()
+      //console.log(billsList)
+      expect(billsList).resolves.toEqual(bills)
     })
   })
 })
