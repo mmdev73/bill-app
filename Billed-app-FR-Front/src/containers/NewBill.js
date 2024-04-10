@@ -15,7 +15,7 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
-
+  // Création d'une méthode qui vérifie que le MimeType est bien autorisé
   fileIsValid = file => {
     const fileMimeType = file.type 
     const authorizedMimeType = [
@@ -38,6 +38,7 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
+    // Si le Mimetype n'est pas autorisé, alors on vide le champ, on alert l'utilisateur, et on sort de la méthode.
     if(!this.fileIsValid(file)){
       e.target.value = ""
       alert('Mauvais type de fichier')

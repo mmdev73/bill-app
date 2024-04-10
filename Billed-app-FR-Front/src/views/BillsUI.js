@@ -21,7 +21,9 @@ const row = (bill) => {
 
 const rows = (data) => {
   if(data && data.length){
+    // Ajout d'un filtre pour ne pas afficher les bills null crées avant débug
     data = data.filter(bill => bill.name !== null)
+    // Ajout d'une fonction de tri par ordre décroissant. Utilisation de l'objet Date de JS
     data = data.sort((a,b) => new Date(b.date) - new Date(a.date))
     return data.map(bill => row(bill)).join("")
   }

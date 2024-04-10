@@ -81,6 +81,7 @@ export default class {
   handleClickIconEye = () => {
     const billUrl = $('#icon-eye-d').attr("data-bill-url")
     const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8)
+    // Ajout d'un ternaire pour la gestion des bills avec un mauvais fichier avant débug
     $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'>${!billUrl.includes('null') ? `<img width=${imgWidth} src=${billUrl} alt="Bill"/>` : "Aucun justificatif"}</div>`)
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
@@ -145,6 +146,7 @@ export default class {
       this.counter ++
     }
 
+    // Ajout d'une condition, qui vérifie si l'index de l'objet est différent du status de la bills. Le but est déviter une duplication de l'écouteur d'évenement.
     bills.forEach(bill => {
       if(bill.status === getStatus(this.index))
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))

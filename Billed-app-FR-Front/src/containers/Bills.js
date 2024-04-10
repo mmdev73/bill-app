@@ -25,6 +25,7 @@ export default class {
   handleClickIconEye = (icon) => {
     const billUrl = icon.getAttribute("data-bill-url")
     const imgWidth = Math.floor($('#modaleFile').width() * 0.5)
+    //Ajout d'un ternaire pour gérer les bills enregistrées avec un mauvais fichier avant débug
     $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container">${!billUrl.includes('null') ? `<img width=${imgWidth} src=${billUrl} alt="Bill" />` : "Aucun justificatif"}</div>`)
     $('#modaleFile').modal('show')
   }

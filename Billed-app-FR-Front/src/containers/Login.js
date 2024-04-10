@@ -39,6 +39,7 @@ export default class Login {
 
   handleSubmitAdmin = e => {
     e.preventDefault()
+    // correction du sélecteur remplacement de employee par admin pour avoir les bons inputs
     const user = {
       type: "Admin",
       email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,

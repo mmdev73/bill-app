@@ -4,6 +4,7 @@
 
 import { screen, fireEvent, waitFor } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
+import BillsUI from "../views/BillsUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import mockStore from "../__mocks__/store.js"
@@ -151,6 +152,25 @@ describe("Given I am connected as an employee", () => {
         email: "a@a",
         pct: 20
       })
+    })
+  })
+  describe("When an error occurs on API", () => {
+    beforeEach(() => { 
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock})
+			//document.body.innerHTML = NewBillUI()
+    })
+    test("Then fetches bills from an API and fails with 404 message error when we are redirected on Bills page", async () => {
+      const html = BillsUI({ error: 'Erreur 404' })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+    })
+
+    test("Then fetches messages from an API and fails with 500 message error when we are redirected on Bills page", async () => {
+      const html = BillsUI({ error: 'Erreur 500' })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
     })
   })
 })
